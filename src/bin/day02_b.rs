@@ -77,9 +77,13 @@ fn solve(input: String) -> i64 {
             let row: Vec<i64> = row.collect();
 
             for delete_index in 0..row.len() {
-                let filtered_row = row.iter().cloned().enumerate().filter_map(|(i, value)| (i != delete_index).then_some(value));
+                let filtered_row = row
+                    .iter()
+                    .cloned()
+                    .enumerate()
+                    .filter_map(|(i, value)| (i != delete_index).then_some(value));
                 if is_safe(filtered_row) {
-                    return Some(())
+                    return Some(());
                 }
             }
 
