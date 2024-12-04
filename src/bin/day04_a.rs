@@ -66,7 +66,11 @@ fn get_second_diagonals(input: &str) -> Vec<String> {
     let start_points = (0..column_count)
         .into_iter()
         .map(|column| (0, column))
-        .chain((1..row_count).into_iter().map(|row| (row, column_count - 1)));
+        .chain(
+            (1..row_count)
+                .into_iter()
+                .map(|row| (row, column_count - 1)),
+        );
 
     start_points
         .map(|(start_row, start_column)| {
