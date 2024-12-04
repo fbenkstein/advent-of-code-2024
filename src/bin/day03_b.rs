@@ -10,7 +10,9 @@ fn read_input() -> Result<String> {
 }
 
 fn solve(input: String) -> i64 {
-    let mul_regex = Regex::new(r"(?P<off>don't)|(?P<on>do)|(?P<op>mul[(](?P<first>\d+),(?P<second>\d+)[)])").unwrap();
+    let mul_regex =
+        Regex::new(r"(?P<off>don't)|(?P<on>do)|(?P<op>mul[(](?P<first>\d+),(?P<second>\d+)[)])")
+            .unwrap();
     let mut result = 0;
     let mut on_off = true;
 
