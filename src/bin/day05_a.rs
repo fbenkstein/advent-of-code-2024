@@ -15,7 +15,6 @@ fn is_valid(rules: &HashMap<i64, HashSet<i64>>, update: &[i64]) -> bool {
         let are_before = &update[..i];
         if let Some(must_after) = rules.get(x) {
             are_before.iter().all(|y| !must_after.contains(y))
-            // are_after.iter().all(|y| !must_before.contains(y))
         } else {
             true
         }
