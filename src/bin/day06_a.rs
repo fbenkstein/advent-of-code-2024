@@ -145,70 +145,20 @@ fn parse_input(input: &str) -> (Map, Guard) {
     }
 }
 
-#[derive(Debug)]
-struct MapView {
-    cells: Vec<Vec<char>>,
-}
-
-#[allow(dead_code)]
-impl MapView {
-    fn new(map: &Map) -> Self {
-        let mut view = Self {
-            cells: vec![vec!['.'; map.dimension.columns]; map.dimension.rows],
-        };
-        map.obstacles
-            .iter()
-            .for_each(|position| view.update(*position, '#'));
-        view
-    }
-
-    fn update(&mut self, Position { row, column }: Position, c: char) {
-        self.cells[row][column] = c;
-    }
-}
-
-impl std::fmt::Display for MapView {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        self.cells.iter().try_for_each(|row| {
-            row.iter().try_for_each(|c| write!(f, "{}", c))?;
-            writeln!(f, "")
-        })
-    }
-}
-
-#[allow(dead_code)]
-const ESCAPE: char = 27 as char;
-
 fn solve(input: String) -> i64 {
     let (map, mut guard) = parse_input(&input);
-    let mut view = MapView::new(&map);
-    let mut view_guard = guard.clone();
-    view.update(guard.position, guard.direction.into());
-    eprintln!("{ESCAPE}[2J{ESCAPE}[1;1H\n{view}\n{guard:?}\n");
-    eprintln!("\n{:-<80}\n", "");
+    let mut visited = HashSet::new();
+    visited.insert(guard.position);
 
     std::iter::from_fn(|| {
         guard.step(&map)?;
         Some(guard.clone())
     })
-    .enumerate()
-    .scan((), |(), (i, guard)| {
-        view.update(view_guard.position, 'O');
-        view.update(guard.position, guard.direction.into());
-        if false {
-            eprintln!("{ESCAPE}[2J{ESCAPE}[1;1H\n{view}\n{guard:?}\n{}\n", i + 1);
-            std::thread::sleep(std::time::Duration::from_millis(5));
-        }
-        view_guard = guard;
-        Some(())
-    })
-    .count()
-    .try_into()
-    .map(|n| {
-        eprintln!("{ESCAPE}[2J{ESCAPE}[1;1H\n{view}\n{guard:?}\n{}\n", n);
-        n
-    })
-    .expect("overflow")
+    .for_each(|guard| {
+        visited.insert(guard.position);
+    });
+
+    visited.len().try_into().expect("overflow")
 }
 
 fn main() -> Result<()> {
