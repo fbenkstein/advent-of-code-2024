@@ -168,18 +168,32 @@ fn causes_loop(map: &Map, guard: &Guard, position: &Position) -> bool {
 fn solve(input: String) -> i64 {
     let (map, mut guard) = parse_input(&input);
     let loop_guard = guard.clone();
-    let mut visited = HashSet::new();
+    let mut visited_set = HashSet::new();
+    let mut visited_vec = Vec::new();
 
     std::iter::from_fn(|| {
         guard.step(&map)?;
         Some(guard.clone())
     })
     .for_each(|guard| {
-        visited.insert(guard.position);
+        if visited_set.insert(guard.position) {
+            visited_vec.push(guard);
+        }
     });
 
-    visited.retain(|position| causes_loop(&map, &loop_guard, position));
-    visited.len().try_into().expect("overflow")
+    visited_vec
+        .iter()
+        .enumerate()
+        .filter(|(i, guard)| {
+            causes_loop(
+                &map,
+                (*i > 0).then(|| &visited_vec[i - 1]).unwrap_or(&loop_guard),
+                &guard.position,
+            )
+        })
+        .count()
+        .try_into()
+        .expect("overflow")
 }
 
 fn main() -> Result<()> {
